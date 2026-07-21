@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SELACV V2.3.2 - Suivi de l’exécution budgétaire</title>
+<title>SELACV V2.3.3 - Suivi de l’exécution budgétaire</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 <style>
@@ -111,7 +111,7 @@
     <div class="brand">
       <img class="brand-logo" src="https://www.u-picardie.fr/sites/default/files/media/2024-06/upjv-bleu.png" alt="Logo UPJV">
       <div>
-        <h1>SELACV <span class="version-chip">V2.3.2</span></h1>
+        <h1>SELACV <span class="version-chip">V2.3.3</span></h1>
         <div class="sub">Suivi de l’exécution budgétaire · Service Exploitation et Logistique Amiens Centre-Ville</div>
       </div>
     </div>
@@ -135,7 +135,7 @@
 <main>
 
 
-  <!-- ============ VUE 0 : TABLEAU DE BORD V2.3.2 ============ -->
+  <!-- ============ VUE 0 : TABLEAU DE BORD V2.3.3 ============ -->
   <section class="view active" id="view-dashboard">
     <div class="hero">
       <div class="hero-main">
@@ -461,9 +461,12 @@
       <div class="chart-box"><h3>Engagé par bâtiment</h3><canvas id="chartBatiment"></canvas></div>
       <div class="chart-box full"><h3>Engagé par équipe</h3><canvas id="chartEquipe"></canvas></div>
       <div class="chart-box"><h3>Répartition par catégorie</h3><canvas id="chartCategorie"></canvas></div>
+      <div class="chart-box"><h3>Engagé par centre de coût</h3><canvas id="chartCentreCout"></canvas></div>
       <div class="chart-box full"><h3>Évolution mensuelle des engagements</h3><canvas id="chartMonthly"></canvas></div>
       <div class="chart-box"><h3>Top 10 fournisseurs</h3><canvas id="chartFournisseurs"></canvas></div>
+      <div class="chart-box"><h3>Statut de validation</h3><canvas id="chartValidation"></canvas></div>
       <div class="chart-box"><h3>État des commandes</h3><canvas id="chartEtat"></canvas></div>
+      <div class="chart-box"><h3>Qualité des dossiers</h3><canvas id="chartCompleteness"></canvas></div>
     </div>
     <div class="footnote">Les commandes « Annulée » sont exclues des engagements. Le secteur budgétaire est déterminé par le centre de coût : COSL = Saint-Leu, COCITAD = Citadelle, COPUC = Cathédrale.</div>
   </section>
@@ -1288,7 +1291,7 @@ function exportCSV(){
   const blob = new Blob(["\uFEFF"+lines.join("\n")], {type:"text/csv;charset=utf-8;"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = "SELACV_V2.12_suivi_execution_budgetaire.csv"; a.click();
+  a.href = url; a.download = "SELACV_V2.3.3_suivi_execution_budgetaire.csv"; a.click();
   URL.revokeObjectURL(url);
 }
 
@@ -1298,15 +1301,23 @@ function renderKPIs(){
   const totalInit = SECTEURS.reduce((s,secteur)=> s + TYPES.reduce((s2,t)=> s2+(budgets[secteur][t]||0),0), 0);
   const nbCommandes = records.length;
   const panierMoyen = eng.length ? totalEngaged/eng.length : 0;
-  const livrees = records.filter(r=>r.EtatCommande==="Livrée").length;
-  const tauxLivraison = records.length ? (livrees/records.length)*100 : 0;
+  const maxCommande = eng.length ? Math.max(...eng.map(r=>r.MontantTTC||0)) : 0;
+  const fournisseursActifs = new Set(eng.map(r=>String(r.Fournisseur||"").trim()).filter(Boolean)).size;
+  const validationsEnAttente = records.filter(r=>{
+    const v=String(r.Validation||"").trim().toLowerCase();
+    return !v || v.includes("attente") || v.includes("à valider") || v.includes("a valider");
+  }).length;
+  const dossiersAvecManquants = records.filter(r=>String(r.PostesManquants||"").trim()).length;
 
   const kpis = [
     {label:"Engagé total", value: fmtEUR(totalEngaged)},
     {label:"Solde disponible", value: fmtEUR(totalInit-totalEngaged)},
     {label:"Nombre de commandes", value: nbCommandes},
     {label:"Panier moyen", value: fmtEUR(panierMoyen)},
-    {label:"Taux de livraison", value: tauxLivraison.toFixed(0)+"%"},
+    {label:"Plus grosse commande", value: fmtEUR(maxCommande)},
+    {label:"Fournisseurs actifs", value: fournisseursActifs},
+    {label:"Validations à traiter", value: validationsEnAttente},
+    {label:"Dossiers avec manquants", value: dossiersAvecManquants},
   ];
   document.getElementById("kpiGrid").innerHTML = kpis.map(k=>`
     <div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.value}</div></div>
@@ -1351,6 +1362,13 @@ function renderCharts(){
     datasets:[{data: byCat.map(c=>c.val), backgroundColor: byCat.map((_,i)=>palette[i%palette.length])}]
   },{ plugins:{legend:{position:"right", labels:{boxWidth:11,font:{size:10.5}}}} });
 
+  // Par centre de coût
+  const byCentreCout = groupSum(engagedRecords("__all__"), "CentreCout").slice(0,20);
+  mkChart("chartCentreCout","bar",{
+    labels: byCentreCout.map(x=>x.key),
+    datasets:[{label:"Montant engagé", data:byCentreCout.map(x=>x.val), backgroundColor:"#5e8f63", borderRadius:4}]
+  },{ indexAxis:"y", plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true}} });
+
   // Mensuel (line)
   const byMonth = groupSumByMonth(engagedRecords("__all__"));
   mkChart("chartMonthly","line",{
@@ -1365,13 +1383,29 @@ function renderCharts(){
     datasets:[{label:"Montant", data:bySup.map(s=>s.val), backgroundColor:"#22356f", borderRadius:4}]
   },{ indexAxis:"y", plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true}} });
 
-  // État commande
-  const byEtat = groupSum(records,"EtatCommande");
+  // Validation (nombre de commandes)
+  const byValidation = groupCount(records, "Validation");
+  mkChart("chartValidation","doughnut",{
+    labels: byValidation.map(e=>e.key),
+    datasets:[{data: byValidation.map(e=>e.val), backgroundColor: byValidation.map((_,i)=>palette[i%palette.length])}]
+  },{ plugins:{legend:{position:"right", labels:{boxWidth:11,font:{size:10.5}}}} });
+
+  // État commande (nombre de commandes)
+  const byEtat = groupCount(records,"EtatCommande");
   mkChart("chartEtat","doughnut",{
     labels: byEtat.map(e=>e.key),
     datasets:[{data: byEtat.map(e=>e.val), backgroundColor: byEtat.map(e=>({
       "Livrée":"#8bc48f","Attente":"#f2c952","Annulée":"#faacac","Partielle":"#86a6fc","Retour":"#9a9b9c"
     }[e.key] || "#999"))}]
+  },{ plugins:{legend:{position:"right", labels:{boxWidth:11,font:{size:10.5}}}} });
+
+  // Qualité / complétude des dossiers
+  const avecManquants = records.filter(r=>String(r.PostesManquants||"").trim()).length;
+  const incomplets = records.filter(r=>![r.Date,r.NumBC,r.CentreCout,r.Fournisseur,r.Categorie].every(v=>String(v??"").trim()) || !(Number(r.MontantTTC)>0)).length;
+  const complets = Math.max(0, records.length - incomplets);
+  mkChart("chartCompleteness","doughnut",{
+    labels:["Dossiers complets","Dossiers incomplets","Avec postes manquants"],
+    datasets:[{data:[complets,incomplets,avecManquants], backgroundColor:["#8bc48f","#f2c952","#faacac"]}]
   },{ plugins:{legend:{position:"right", labels:{boxWidth:11,font:{size:10.5}}}} });
 }
 
@@ -1389,6 +1423,14 @@ function groupSum(rows, key){
   rows.forEach(r=>{
     const k = r[key] || "Non renseigné";
     m.set(k, (m.get(k)||0) + r.MontantTTC);
+  });
+  return [...m.entries()].map(([key,val])=>({key,val})).sort((a,b)=>b.val-a.val);
+}
+function groupCount(rows, key){
+  const m = new Map();
+  rows.forEach(r=>{
+    const k = String(r[key]??"").trim() || "Non renseigné";
+    m.set(k, (m.get(k)||0) + 1);
   });
   return [...m.entries()].map(([key,val])=>({key,val})).sort((a,b)=>b.val-a.val);
 }
