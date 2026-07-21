@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SELACV V2.2.4 - Suivi de l’exécution budgétaire</title>
+<title>SELACV V2.3 - Suivi de l’exécution budgétaire</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 <style>
@@ -107,7 +107,7 @@
     <div class="brand">
       <img class="brand-logo" src="https://www.u-picardie.fr/sites/default/files/media/2024-06/upjv-bleu.png" alt="Logo UPJV">
       <div>
-        <h1>SELACV <span class="version-chip">V2.2.4</span></h1>
+        <h1>SELACV <span class="version-chip">V2.3</span></h1>
         <div class="sub">Suivi de l’exécution budgétaire · Service Exploitation et Logistique Amiens Centre-Ville</div>
       </div>
     </div>
@@ -131,7 +131,7 @@
 <main>
 
 
-  <!-- ============ VUE 0 : TABLEAU DE BORD V2 ============ -->
+  <!-- ============ VUE 0 : TABLEAU DE BORD V2.3 ============ -->
   <section class="view active" id="view-dashboard">
     <div class="hero">
       <div class="hero-main">
@@ -186,7 +186,7 @@
   <section class="view" id="view-saisie">
     <div class="panel">
       <h2>Nouvelle commande</h2>
-      <div class="desc">Saisissez une commande. Les listes sont alimentées par les valeurs déjà présentes dans Grist ; Secteur, Bâtiment et Équipe sont filtrés en cascade. Les champs marqués <span class="req">*</span> sont recommandés.</div>
+      <div class="desc">Saisissez une commande. Les listes reprennent les choix configurés dans Grist. Secteur, Bâtiment et Équipe sont filtrés en cascade à partir des relations observées dans les commandes. Les champs marqués <span class="req">*</span> sont recommandés.</div>
 
       <form id="formSaisie">
         <div class="form-grid">
@@ -201,8 +201,9 @@
             </div>
             <div class="field">
               <label>Centre de coût</label>
-              <input type="text" id="f_centrecout" list="dl_centrescout" placeholder="Choix du centre de coût">
-              <datalist id="dl_centrescout"></datalist>
+              <select id="f_centrecout">
+                <option value="">Choix du centre de coût</option>
+              </select>
             </div>
           </div>
 
@@ -227,13 +228,15 @@
             </div>
             <div class="field">
               <label>Fournisseur <span class="req">*</span></label>
-              <input type="text" id="f_fournisseur" list="dl_fournisseurs" required autocomplete="off" placeholder="Choix du fournisseur">
-              <datalist id="dl_fournisseurs"></datalist>
+              <select id="f_fournisseur" required>
+                <option value="">Choix du fournisseur</option>
+              </select>
             </div>
             <div class="field">
               <label>Centrale d'achat</label>
-              <input type="text" id="f_centrale" list="dl_centrales" placeholder="Choix de la centrale d’achat" autocomplete="off">
-              <datalist id="dl_centrales"></datalist>
+              <select id="f_centrale">
+                <option value="">Choix de la centrale d’achat</option>
+              </select>
             </div>
           </div>
 
@@ -246,13 +249,15 @@
           </div>
           <div class="field">
             <label>Catégorie <span class="req">*</span></label>
-            <input type="text" id="f_categorie" list="dl_categories" required autocomplete="off" placeholder="Choix de la catégorie">
-            <datalist id="dl_categories"></datalist>
+            <select id="f_categorie" required>
+              <option value="">Choix de la catégorie</option>
+            </select>
           </div>
           <div class="field">
             <label>Marché</label>
-            <input type="text" id="f_marches" list="dl_marches" placeholder="Choix du marché">
-            <datalist id="dl_marches"><option value="Oui"><option value="Non"></datalist>
+            <select id="f_marches">
+              <option value="">Choix du marché</option>
+            </select>
           </div>
           <div class="field span2">
             <label>Objet de la commande <span class="req">*</span></label>
@@ -268,21 +273,29 @@
           </div>
           <div class="field">
             <label>Validation agent</label>
-            <input type="text" id="f_validation" list="dl_validations" placeholder="Choix de la validation">
-            <datalist id="dl_validations"></datalist>
+            <select id="f_validation">
+              <option value="">Choix de la validation</option>
+            </select>
           </div>
           <div class="field">
             <label>État de la commande</label>
-            <input type="text" id="f_etat" list="dl_etats" value="Attente" autocomplete="off">
-            <datalist id="dl_etats">
-              <option value="Attente"><option value="Livrée"><option value="Partielle"><option value="Annulée"><option value="Retour">
-            </datalist>
+            <select id="f_etat">
+              <option value="Attente" selected>Attente</option>
+              <option value="Livrée">Livrée</option>
+              <option value="Partielle">Partielle</option>
+              <option value="Annulée">Annulée</option>
+              <option value="Retour">Retour</option>
+            </select>
           </div>
           <div class="field">
             <label>Poste manquant</label>
             <input type="text" id="f_postes">
           </div>
         </div>
+
+        <datalist id="dl_fournisseurs"></datalist>
+        <datalist id="dl_centrales"></datalist>
+        <datalist id="dl_categories"></datalist>
         <div class="form-actions">
           <button type="button" class="btn btn-ghost" id="btnReset">Réinitialiser</button>
           <button type="submit" class="btn btn-primary" id="btnSubmit">＋ Ajouter la commande</button>
@@ -441,6 +454,8 @@
 
     <div class="charts-grid">
       <div class="chart-box"><h3>Engagé par secteur (Fonct. / Invest.)</h3><canvas id="chartSecteur"></canvas></div>
+      <div class="chart-box"><h3>Engagé par bâtiment</h3><canvas id="chartBatiment"></canvas></div>
+      <div class="chart-box full"><h3>Engagé par équipe</h3><canvas id="chartEquipe"></canvas></div>
       <div class="chart-box"><h3>Répartition par catégorie</h3><canvas id="chartCategorie"></canvas></div>
       <div class="chart-box full"><h3>Évolution mensuelle des engagements</h3><canvas id="chartMonthly"></canvas></div>
       <div class="chart-box"><h3>Top 10 fournisseurs</h3><canvas id="chartFournisseurs"></canvas></div>
@@ -618,19 +633,35 @@ async function loadGristChoiceOptions(){
   try {
     const meta = await grist.docApi.fetchTable("_grist_Tables_column");
     const rows = Array.isArray(meta) ? meta : tableDataToRows(meta);
-    for (const logicalName of ["Secteur","Batiment","Equipe","CentreCout","Fournisseur","CentraleAchat","Categorie","Marches","Validation","EtatCommande"]) {
+    const logicalNames = ["Secteur","Batiment","Equipe","CentreCout","Fournisseur","CentraleAchat","Categorie","Marches","Validation","EtatCommande"];
+    logicalNames.forEach(logicalName => {
       const colId = mappedColumnId(logicalName);
-      if (!colId) continue;
+      if (!colId) return;
       const candidates = rows.filter(row => String(row.colId || "") === String(colId));
-      const row = candidates.find(r => String(r.type || "").startsWith("Choice")) || candidates[0];
-      if (!row) continue;
+      const row = candidates.find(r => /^(Choice|ChoiceList)/.test(String(r.type || ""))) || candidates[0];
+      if (!row) return;
       const options = parseWidgetOptions(row.widgetOptions);
-      const choices = Array.isArray(options.choices) ? options.choices : [];
-      gristChoiceOptions[logicalName] = choices.map(choice => String(choice)).filter(Boolean);
-    }
+      const rawChoices = Array.isArray(options.choices) ? options.choices : [];
+      gristChoiceOptions[logicalName] = normalizeChoiceValues(rawChoices);
+    });
   } catch (err) {
     console.warn("Lecture des choix Grist impossible; utilisation des valeurs existantes.", err);
   }
+}
+
+function normalizeChoiceValues(values){
+  const flat=[];
+  (values || []).forEach(value=>{
+    // Certaines structures Grist peuvent contenir une liste encodée ["L", ...].
+    if(Array.isArray(value)){
+      const items=value[0]==="L" ? value.slice(1) : value;
+      items.forEach(item=>flat.push(item));
+    }else{
+      flat.push(value);
+    }
+  });
+  return [...new Set(flat.map(v=>String(v ?? "").trim()).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b,"fr",{sensitivity:"base"}));
 }
 
 function tableDataToRows(data){
@@ -747,6 +778,8 @@ document.getElementById("btnReset").addEventListener("click", ()=> {
   selectedType = "Fonctionnement";
   document.querySelectorAll(".type-toggle button").forEach(b=>b.classList.toggle("on", b.dataset.type===selectedType));
   document.getElementById("f_date").valueAsDate = new Date();
+  renderDatalists();
+  document.getElementById("f_etat").value = "Attente";
 });
 
 document.getElementById("formSaisie").addEventListener("submit", async (e)=>{
@@ -1094,23 +1127,41 @@ function badge(etat){
 
 /* ================= DATALISTS (autocomplete) ================= */
 function renderDatalists(){
+  const valuesByField = {
+    CentreCout: combinedChoices("CentreCout", records.map(r=>r.CentreCout)),
+    Fournisseur: combinedChoices("Fournisseur", records.map(r=>r.Fournisseur)),
+    CentraleAchat: combinedChoices("CentraleAchat", records.map(r=>r.CentraleAchat)),
+    Categorie: combinedChoices("Categorie", records.map(r=>r.Categorie)),
+    Marches: combinedChoices("Marches", ["Oui","Non", ...records.map(r=>r.Marches)]),
+    Validation: combinedChoices("Validation", records.map(r=>r.Validation)),
+    EtatCommande: combinedChoices("EtatCommande", ["Attente","Livrée","Partielle","Annulée","Retour", ...records.map(r=>r.EtatCommande)])
+  };
+
+  fillSelect("f_centrecout", valuesByField.CentreCout, "Choix du centre de coût", document.getElementById("f_centrecout")?.value||"", false);
+  fillSelect("f_fournisseur", valuesByField.Fournisseur, "Choix du fournisseur", document.getElementById("f_fournisseur")?.value||"", false);
+  fillSelect("f_centrale", valuesByField.CentraleAchat, "Choix de la centrale d’achat", document.getElementById("f_centrale")?.value||"", false);
+  fillSelect("f_categorie", valuesByField.Categorie, "Choix de la catégorie", document.getElementById("f_categorie")?.value||"", false);
+  fillSelect("f_marches", valuesByField.Marches, "Choix du marché", document.getElementById("f_marches")?.value||"", false);
+  fillSelect("f_validation", valuesByField.Validation, "Choix de la validation", document.getElementById("f_validation")?.value||"", false);
+  fillSelect("f_etat", valuesByField.EtatCommande, "Choix de l’état", document.getElementById("f_etat")?.value||"Attente", false);
+
+  // Datalists conservées pour les champs de l’onglet Modification.
+  fillDatalist("dl_fournisseurs", valuesByField.Fournisseur);
+  fillDatalist("dl_centrales", valuesByField.CentraleAchat);
+  fillDatalist("dl_categories", valuesByField.Categorie);
+
   const currentSecteur=document.getElementById("f_secteur")?.value||"";
   fillSelect("f_secteur", combinedChoices("Secteur", [...SECTEURS, ...records.map(r=>r.Secteur)]), "Choix du secteur", currentSecteur, false);
-  fillDatalist("dl_centrescout", combinedChoices("CentreCout", records.map(r=>r.CentreCout)));
-  fillDatalist("dl_fournisseurs", combinedChoices("Fournisseur", records.map(r=>r.Fournisseur)));
-  fillDatalist("dl_centrales", combinedChoices("CentraleAchat", records.map(r=>r.CentraleAchat)));
-  fillDatalist("dl_categories", combinedChoices("Categorie", records.map(r=>r.Categorie)));
-  fillDatalist("dl_marches", combinedChoices("Marches", ["Oui","Non", ...records.map(r=>r.Marches)]));
-  fillDatalist("dl_validations", combinedChoices("Validation", records.map(r=>r.Validation)));
-  fillDatalist("dl_etats", combinedChoices("EtatCommande", ["Attente","Livrée","Partielle","Annulée","Retour", ...records.map(r=>r.EtatCommande)]));
   refreshBatimentOptions(false);
 }
 
 function refreshBatimentOptions(clearInvalid=true){
   const secteur=(document.getElementById("f_secteur")?.value||"").trim();
   const current=document.getElementById("f_batiment")?.value||"";
-  const used=records.filter(r=>!secteur || r.Secteur===secteur).map(r=>r.Batiment);
-  const values=combinedChoices("Batiment", used);
+  const related=records.filter(r=>secteur && r.Secteur===secteur).map(r=>r.Batiment).filter(Boolean);
+  const values = secteur && related.length
+    ? [...new Set(related)].sort((a,b)=>String(a).localeCompare(String(b),"fr",{sensitivity:"base"}))
+    : combinedChoices("Batiment", records.map(r=>r.Batiment));
   fillSelect("f_batiment", values, "Choix du bâtiment", current, clearInvalid);
   refreshEquipeOptions(clearInvalid);
 }
@@ -1119,8 +1170,10 @@ function refreshEquipeOptions(clearInvalid=true){
   const secteur=(document.getElementById("f_secteur")?.value||"").trim();
   const batiment=(document.getElementById("f_batiment")?.value||"").trim();
   const current=document.getElementById("f_equipe")?.value||"";
-  const used=records.filter(r=>(!secteur || r.Secteur===secteur) && (!batiment || r.Batiment===batiment)).map(r=>r.Equipe);
-  const values=combinedChoices("Equipe", used);
+  const related=records.filter(r=>(!secteur || r.Secteur===secteur) && batiment && r.Batiment===batiment).map(r=>r.Equipe).filter(Boolean);
+  const values = batiment && related.length
+    ? [...new Set(related)].sort((a,b)=>String(a).localeCompare(String(b),"fr",{sensitivity:"base"}))
+    : combinedChoices("Equipe", records.map(r=>r.Equipe));
   fillSelect("f_equipe", values, "Choix de l’équipe", current, clearInvalid);
 }
 
@@ -1136,13 +1189,12 @@ function fillSelect(id, values, placeholder, currentValue, clearInvalid=true){
   }
 }
 
-document.getElementById("f_secteur").addEventListener("input", ()=>refreshBatimentOptions(true));
 document.getElementById("f_secteur").addEventListener("change", ()=>refreshBatimentOptions(true));
-document.getElementById("f_batiment").addEventListener("input", ()=>refreshEquipeOptions(true));
 document.getElementById("f_batiment").addEventListener("change", ()=>refreshEquipeOptions(true));
 function fillDatalist(id, values){
   const el = document.getElementById(id);
-  const uniq = [...new Set(values.filter(Boolean))].sort();
+  if(!el) return;
+  const uniq = [...new Set(values.filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),"fr",{sensitivity:"base"}));
   el.innerHTML = uniq.map(v=>`<option value="${escapeHtml(v)}">`).join("");
 }
 
@@ -1226,6 +1278,20 @@ function renderCharts(){
       {label:"Investissement", data:bySecteur.map(s=>s.Investissement), backgroundColor:"#86a6fc", borderRadius:5},
     ]
   },{ plugins:{legend:{position:"bottom"}}, scales:{y:{beginAtZero:true}} });
+
+  // Par bâtiment
+  const byBatiment = groupSum(engagedRecords("__all__"), "Batiment").slice(0,20);
+  mkChart("chartBatiment","bar",{
+    labels: byBatiment.map(x=>x.key),
+    datasets:[{label:"Montant engagé", data:byBatiment.map(x=>x.val), backgroundColor:"#22356f", borderRadius:4}]
+  },{ indexAxis:"y", plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true}} });
+
+  // Par équipe
+  const byEquipe = groupSum(engagedRecords("__all__"), "Equipe").slice(0,20);
+  mkChart("chartEquipe","bar",{
+    labels: byEquipe.map(x=>x.key),
+    datasets:[{label:"Montant engagé", data:byEquipe.map(x=>x.val), backgroundColor:"#86a6fc", borderRadius:4}]
+  },{ indexAxis:"y", plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true}} });
 
   // Catégorie (doughnut)
   const byCat = groupSum(engagedRecords("__all__"), "Categorie");
