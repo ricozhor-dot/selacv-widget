@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SELACV V2.12.3 - Suivi de l’exécution budgétaire</title>
+<title>SELACV V2.2.4 - Suivi de l’exécution budgétaire</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 <style>
@@ -106,7 +106,7 @@
     <div class="brand">
       <img class="brand-logo" src="https://www.u-picardie.fr/sites/default/files/media/2024-06/upjv-bleu.png" alt="Logo UPJV">
       <div>
-        <h1>SELACV <span class="version-chip">V2.12.3</span></h1>
+        <h1>SELACV <span class="version-chip">V2.2.4</span></h1>
         <div class="sub">Suivi de l’exécution budgétaire · Service Exploitation et Logistique Amiens Centre-Ville</div>
       </div>
     </div>
@@ -224,27 +224,27 @@
           </div>
           <div class="field">
             <label>Centre de coût</label>
-            <input type="text" id="f_centrecout" list="dl_centrescout" placeholder="Sélectionner ou saisir">
+            <input type="text" id="f_centrecout" list="dl_centrescout" placeholder="Choix du centre de coût">
             <datalist id="dl_centrescout"></datalist>
           </div>
           <div class="field">
             <label>Fournisseur <span class="req">*</span></label>
-            <input type="text" id="f_fournisseur" list="dl_fournisseurs" required autocomplete="off">
+            <input type="text" id="f_fournisseur" list="dl_fournisseurs" required autocomplete="off" placeholder="Choix du fournisseur">
             <datalist id="dl_fournisseurs"></datalist>
           </div>
           <div class="field">
             <label>Centrale d'achat</label>
-            <input type="text" id="f_centrale" list="dl_centrales" placeholder="Aucune, UGAP…" autocomplete="off">
+            <input type="text" id="f_centrale" list="dl_centrales" placeholder="Choix de la centrale d’achat" autocomplete="off">
             <datalist id="dl_centrales"></datalist>
           </div>
           <div class="field">
             <label>Catégorie <span class="req">*</span></label>
-            <input type="text" id="f_categorie" list="dl_categories" required autocomplete="off">
+            <input type="text" id="f_categorie" list="dl_categories" required autocomplete="off" placeholder="Choix de la catégorie">
             <datalist id="dl_categories"></datalist>
           </div>
           <div class="field">
             <label>Marché</label>
-            <input type="text" id="f_marches" list="dl_marches" placeholder="Oui, Non ou référence">
+            <input type="text" id="f_marches" list="dl_marches" placeholder="Choix du marché">
             <datalist id="dl_marches"><option value="Oui"><option value="Non"></datalist>
           </div>
           <div class="field span2">
@@ -261,7 +261,7 @@
           </div>
           <div class="field">
             <label>Validation agent</label>
-            <input type="text" id="f_validation" list="dl_validations" placeholder="Nom ou prénom">
+            <input type="text" id="f_validation" list="dl_validations" placeholder="Choix de la validation">
             <datalist id="dl_validations"></datalist>
           </div>
           <div class="field">
