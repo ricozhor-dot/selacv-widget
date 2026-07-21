@@ -87,7 +87,7 @@
   .hero-main{background:linear-gradient(135deg,var(--accent),#344f98);color:#fff;border-radius:14px;padding:24px;box-shadow:0 8px 24px rgba(34,53,111,.18);position:relative;overflow:hidden}
   .hero-main:after{content:"";position:absolute;width:220px;height:220px;border:40px solid rgba(255,255,255,.07);border-radius:50%;right:-70px;top:-90px}
   .hero-eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;opacity:.78}
-  .hero-title{font-size:25px;color:#fff;margin:6px 0 8px}.hero-copy{max-width:640px;font-size:13px;opacity:.88}
+  .hero-title{font-size:25px;color:#fff;margin:6px 0 8px}.hero-copy{max-width:640px;font-size:13px;opacity:.88}.daily-welcome{margin-top:14px;padding:13px 15px;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.10);border-radius:10px;max-width:720px;position:relative;z-index:1}.daily-welcome-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:7px}.daily-hello{font-size:16px;font-weight:700;color:#fff}.daily-date{font-size:11.5px;font-weight:700;opacity:.82;text-transform:capitalize}.daily-quote{font-size:13px;line-height:1.55;font-style:italic;color:#fff;opacity:.94}.daily-quote-label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-style:normal;font-weight:700;opacity:.7;margin-bottom:3px}
   .hero-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}.hero-actions .btn-primary{background:#fff;color:var(--accent)}.hero-actions .btn-ghost{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.25)}
   .hero-side{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 4px 12px rgba(0,0,0,.05)}
   .hero-side h3{font-size:14px;margin-bottom:12px}.health-line{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px}.health-line:last-child{border-bottom:0}.health-value{font-weight:700;color:var(--accent)}
@@ -135,8 +135,13 @@
     <div class="hero">
       <div class="hero-main">
         <div class="hero-eyebrow">Pilotage budgétaire · Exercice en cours</div>
-        <h2 class="hero-title">Une vision immédiate des crédits et des commandes</h2>
-        <div class="hero-copy">Suivez les engagements, identifiez les lignes sous tension et accédez rapidement aux actions prioritaires du service.</div>
+        <div class="daily-welcome" aria-live="polite">
+          <div class="daily-welcome-head">
+            <div class="daily-hello" id="dailyHello">Bonjour</div>
+            <div class="daily-date" id="dailyDate"></div>
+          </div>
+          <div class="daily-quote"><span class="daily-quote-label">Citation du jour</span><span id="dailyQuote"></span></div>
+        </div>
         <div class="hero-actions">
           <button class="btn btn-primary" data-go="saisie">＋ Saisir une commande</button>
           <button class="btn btn-ghost" data-go="consult">Consulter les commandes</button>
@@ -1226,6 +1231,53 @@ function escapeHtml(s){
 }
 
 
+/* ================= ACCUEIL DU JOUR ================= */
+const DAILY_QUOTES = [
+  "Chaque donnée bien renseignée rend la décision plus simple.",
+  "Un budget maîtrisé commence par une vision claire.",
+  "Les petits contrôles d’aujourd’hui évitent les grandes corrections de demain.",
+  "La rigueur donne de la liberté à l’action.",
+  "Bien suivre, c’est déjà mieux prévoir.",
+  "Une priorité claire transforme l’effort en résultat.",
+  "La qualité se construit dans la constance des gestes simples.",
+  "Décider sereinement, c’est disposer d’une information fiable.",
+  "Chaque commande suivie renforce la maîtrise collective.",
+  "L’organisation rend visible ce qui compte vraiment.",
+  "Prévoir, suivre, ajuster : trois gestes pour avancer avec confiance.",
+  "Une bonne gestion relie les moyens aux besoins réels.",
+  "La précision d’aujourd’hui prépare l’efficacité de demain.",
+  "Les résultats durables naissent d’un suivi régulier.",
+  "Une information partagée devient une force collective.",
+  "La simplicité est souvent le meilleur allié de la performance.",
+  "Chaque amélioration, même discrète, fait progresser l’ensemble.",
+  "Un indicateur utile éclaire l’action, il ne la remplace pas.",
+  "La maîtrise budgétaire est une discipline au service des projets.",
+  "Voir juste permet d’agir au bon moment.",
+  "La confiance grandit lorsque les données sont claires.",
+  "Une gestion attentive protège les marges de manœuvre.",
+  "Le bon réflexe : vérifier, comprendre, puis décider.",
+  "La continuité des efforts fait la solidité des résultats.",
+  "Mieux connaître ses engagements, c’est mieux préparer l’avenir.",
+  "La valeur d’un suivi se mesure aux décisions qu’il améliore.",
+  "Un cap partagé rend chaque action plus cohérente.",
+  "L’efficacité commence souvent par une information bien organisée.",
+  "Ce qui est suivi avec soin peut être amélioré avec confiance.",
+  "Une décision utile s’appuie sur des faits lisibles.",
+  "Aujourd’hui est toujours un bon jour pour clarifier les priorités."
+];
+function renderDailyWelcome(){
+  const now=new Date();
+  const key=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
+  let hash=0;
+  for(const char of key) hash=(hash*31+char.charCodeAt(0))>>>0;
+  const quote=DAILY_QUOTES[hash%DAILY_QUOTES.length];
+  const dateText=now.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  const hello=document.getElementById("dailyHello"), date=document.getElementById("dailyDate"), quoteEl=document.getElementById("dailyQuote");
+  if(hello) hello.textContent="Bonjour 👋";
+  if(date) date.textContent=dateText;
+  if(quoteEl) quoteEl.textContent=`« ${quote} »`;
+}
+
 /* ================= TABLEAU DE BORD V2 ================= */
 function budgetTotals(){
   const initial=SITES.reduce((sum,s)=>sum+TYPES.reduce((x,t)=>x+(budgets[s][t]||0),0),0);
@@ -1268,6 +1320,7 @@ function renderDashboard(){
 
 /* ================= MASTER RENDER ================= */
 function renderAll(){
+  renderDailyWelcome();
   renderDashboard();
   renderRecentEntries();
   renderDatalists();
