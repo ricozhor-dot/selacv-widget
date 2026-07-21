@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SELACV V2.12.2 - Suivi de l’exécution budgétaire</title>
+<title>SELACV V2.12.3 - Suivi de l’exécution budgétaire</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 <style>
@@ -106,7 +106,7 @@
     <div class="brand">
       <img class="brand-logo" src="https://www.u-picardie.fr/sites/default/files/media/2024-06/upjv-bleu.png" alt="Logo UPJV">
       <div>
-        <h1>SELACV <span class="version-chip">V2.12.2</span></h1>
+        <h1>SELACV <span class="version-chip">V2.12.3</span></h1>
         <div class="sub">Suivi de l’exécution budgétaire · Service Exploitation et Logistique Amiens Centre-Ville</div>
       </div>
     </div>
@@ -206,8 +206,9 @@
           </div>
           <div class="field">
             <label>Secteur <span class="req">*</span></label>
-            <input type="text" id="f_secteur" list="dl_secteurs" required autocomplete="off" placeholder="Sélectionner ou saisir">
-            <datalist id="dl_secteurs"></datalist>
+            <select id="f_secteur" required>
+              <option value="">Choix du secteur</option>
+            </select>
           </div>
           <div class="field">
             <label>Bâtiment</label>
@@ -1086,7 +1087,8 @@ function badge(etat){
 
 /* ================= DATALISTS (autocomplete) ================= */
 function renderDatalists(){
-  fillDatalist("dl_secteurs", combinedChoices("Secteur", [...SECTEURS, ...records.map(r=>r.Secteur)]));
+  const currentSecteur=document.getElementById("f_secteur")?.value||"";
+  fillSelect("f_secteur", combinedChoices("Secteur", [...SECTEURS, ...records.map(r=>r.Secteur)]), "Choix du secteur", currentSecteur, false);
   fillDatalist("dl_centrescout", combinedChoices("CentreCout", records.map(r=>r.CentreCout)));
   fillDatalist("dl_fournisseurs", combinedChoices("Fournisseur", records.map(r=>r.Fournisseur)));
   fillDatalist("dl_centrales", combinedChoices("CentraleAchat", records.map(r=>r.CentraleAchat)));
