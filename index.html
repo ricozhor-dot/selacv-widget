@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SELACV V2.12.1 - Suivi de l’exécution budgétaire</title>
+<title>SELACV V2.12.2 - Suivi de l’exécution budgétaire</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 <style>
@@ -106,7 +106,7 @@
     <div class="brand">
       <img class="brand-logo" src="https://www.u-picardie.fr/sites/default/files/media/2024-06/upjv-bleu.png" alt="Logo UPJV">
       <div>
-        <h1>SELACV <span class="version-chip">V2.12.1</span></h1>
+        <h1>SELACV <span class="version-chip">V2.12.2</span></h1>
         <div class="sub">Suivi de l’exécution budgétaire · Service Exploitation et Logistique Amiens Centre-Ville</div>
       </div>
     </div>
@@ -211,13 +211,15 @@
           </div>
           <div class="field">
             <label>Bâtiment</label>
-            <input type="text" id="f_batiment" list="dl_batiments" autocomplete="off" placeholder="Filtré selon le secteur">
-            <datalist id="dl_batiments"></datalist>
+            <select id="f_batiment">
+              <option value="">Choix du bâtiment</option>
+            </select>
           </div>
           <div class="field">
             <label>Équipe</label>
-            <input type="text" id="f_equipe" list="dl_equipes" autocomplete="off" placeholder="Filtrée selon le bâtiment">
-            <datalist id="dl_equipes"></datalist>
+            <select id="f_equipe">
+              <option value="">Choix de l’équipe</option>
+            </select>
           </div>
           <div class="field">
             <label>Centre de coût</label>
@@ -497,6 +499,7 @@ let selectedType = "Fonctionnement"; // for saisie form
 let selectedEditType = "Fonctionnement";
 let sortKey = "Date", sortDir = -1;
 let charts = {};
+let gristChoiceOptions = {}; // choix configurés dans les colonnes Grist
 
 /* ================= GRIST WIRING ================= */
 function isGristAvailable(){ return typeof grist !== "undefined"; }
@@ -504,8 +507,9 @@ function isGristAvailable(){ return typeof grist !== "undefined"; }
 if (isGristAvailable()) {
   grist.ready({ columns: COLUMN_DEFS, requiredAccess: "full" });
 
-  grist.onRecords((recs, maps) => {
+  grist.onRecords(async (recs, maps) => {
     mappings = maps || {};
+    await loadGristChoiceOptions();
     const mappedRecords = grist.mapColumnNames(recs, maps);
     if (!mappedRecords) {
       records = [];
@@ -597,6 +601,50 @@ function mappedColumnId(logicalName){
     return value.colId || value.columnId || value.id || null;
   }
   return null;
+}
+
+
+async function loadGristChoiceOptions(){
+  gristChoiceOptions = {};
+  if (!isGristAvailable() || !grist.docApi || !mappings) return;
+  try {
+    const meta = await grist.docApi.fetchTable("_grist_Tables_column");
+    const rows = Array.isArray(meta) ? meta : tableDataToRows(meta);
+    for (const logicalName of ["Secteur","Batiment","Equipe","CentreCout","Fournisseur","CentraleAchat","Categorie","Marches","Validation","EtatCommande"]) {
+      const colId = mappedColumnId(logicalName);
+      if (!colId) continue;
+      const candidates = rows.filter(row => String(row.colId || "") === String(colId));
+      const row = candidates.find(r => String(r.type || "").startsWith("Choice")) || candidates[0];
+      if (!row) continue;
+      const options = parseWidgetOptions(row.widgetOptions);
+      const choices = Array.isArray(options.choices) ? options.choices : [];
+      gristChoiceOptions[logicalName] = choices.map(choice => String(choice)).filter(Boolean);
+    }
+  } catch (err) {
+    console.warn("Lecture des choix Grist impossible; utilisation des valeurs existantes.", err);
+  }
+}
+
+function tableDataToRows(data){
+  if (!data || typeof data !== "object") return [];
+  const ids = Array.isArray(data.id) ? data.id : [];
+  const keys = Object.keys(data).filter(k => Array.isArray(data[k]));
+  return ids.map((_, i) => {
+    const row = {};
+    keys.forEach(k => row[k] = data[k][i]);
+    return row;
+  });
+}
+
+function parseWidgetOptions(raw){
+  if (!raw) return {};
+  if (typeof raw === "object") return raw;
+  try { return JSON.parse(raw); } catch (_) { return {}; }
+}
+
+function combinedChoices(logicalName, usedValues=[]){
+  return [...new Set([...(gristChoiceOptions[logicalName] || []), ...usedValues].filter(Boolean).map(String))]
+    .sort((a,b)=>a.localeCompare(b,"fr",{sensitivity:"base"}));
 }
 
 async function toGristFields(logicalFields){
@@ -1038,39 +1086,45 @@ function badge(etat){
 
 /* ================= DATALISTS (autocomplete) ================= */
 function renderDatalists(){
-  fillDatalist("dl_secteurs", [...SECTEURS, ...records.map(r=>r.Secteur)]);
-  fillDatalist("dl_centrescout", records.map(r=>r.CentreCout));
-  fillDatalist("dl_fournisseurs", records.map(r=>r.Fournisseur));
-  fillDatalist("dl_centrales", records.map(r=>r.CentraleAchat));
-  fillDatalist("dl_categories", records.map(r=>r.Categorie));
-  fillDatalist("dl_marches", ["Oui","Non", ...records.map(r=>r.Marches)]);
-  fillDatalist("dl_validations", records.map(r=>r.Validation));
-  fillDatalist("dl_etats", ["Attente","Livrée","Partielle","Annulée","Retour", ...records.map(r=>r.EtatCommande)]);
+  fillDatalist("dl_secteurs", combinedChoices("Secteur", [...SECTEURS, ...records.map(r=>r.Secteur)]));
+  fillDatalist("dl_centrescout", combinedChoices("CentreCout", records.map(r=>r.CentreCout)));
+  fillDatalist("dl_fournisseurs", combinedChoices("Fournisseur", records.map(r=>r.Fournisseur)));
+  fillDatalist("dl_centrales", combinedChoices("CentraleAchat", records.map(r=>r.CentraleAchat)));
+  fillDatalist("dl_categories", combinedChoices("Categorie", records.map(r=>r.Categorie)));
+  fillDatalist("dl_marches", combinedChoices("Marches", ["Oui","Non", ...records.map(r=>r.Marches)]));
+  fillDatalist("dl_validations", combinedChoices("Validation", records.map(r=>r.Validation)));
+  fillDatalist("dl_etats", combinedChoices("EtatCommande", ["Attente","Livrée","Partielle","Annulée","Retour", ...records.map(r=>r.EtatCommande)]));
   refreshBatimentOptions(false);
-  refreshEquipeOptions(false);
 }
 
 function refreshBatimentOptions(clearInvalid=true){
   const secteur=(document.getElementById("f_secteur")?.value||"").trim();
-  let values=records.filter(r=>!secteur || r.Secteur===secteur).map(r=>r.Batiment);
-  if(!values.some(Boolean)) values=records.map(r=>r.Batiment);
-  fillDatalist("dl_batiments", values);
-  const input=document.getElementById("f_batiment");
-  const allowed=new Set(values.filter(Boolean));
-  if(clearInvalid && input && input.value && allowed.size && !allowed.has(input.value)) input.value="";
+  const current=document.getElementById("f_batiment")?.value||"";
+  const used=records.filter(r=>!secteur || r.Secteur===secteur).map(r=>r.Batiment);
+  const values=combinedChoices("Batiment", used);
+  fillSelect("f_batiment", values, "Choix du bâtiment", current, clearInvalid);
   refreshEquipeOptions(clearInvalid);
 }
 
 function refreshEquipeOptions(clearInvalid=true){
   const secteur=(document.getElementById("f_secteur")?.value||"").trim();
   const batiment=(document.getElementById("f_batiment")?.value||"").trim();
-  let values=records.filter(r=>(!secteur || r.Secteur===secteur) && (!batiment || r.Batiment===batiment)).map(r=>r.Equipe);
-  if(!values.some(Boolean)) values=records.filter(r=>!secteur || r.Secteur===secteur).map(r=>r.Equipe);
-  if(!values.some(Boolean)) values=records.map(r=>r.Equipe);
-  fillDatalist("dl_equipes", values);
-  const input=document.getElementById("f_equipe");
-  const allowed=new Set(values.filter(Boolean));
-  if(clearInvalid && input && input.value && allowed.size && !allowed.has(input.value)) input.value="";
+  const current=document.getElementById("f_equipe")?.value||"";
+  const used=records.filter(r=>(!secteur || r.Secteur===secteur) && (!batiment || r.Batiment===batiment)).map(r=>r.Equipe);
+  const values=combinedChoices("Equipe", used);
+  fillSelect("f_equipe", values, "Choix de l’équipe", current, clearInvalid);
+}
+
+function fillSelect(id, values, placeholder, currentValue, clearInvalid=true){
+  const el=document.getElementById(id);
+  if(!el) return;
+  const uniq=[...new Set(values.filter(Boolean).map(String))];
+  el.innerHTML=`<option value="">${placeholder}</option>`+uniq.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
+  if(currentValue && uniq.includes(currentValue)) el.value=currentValue;
+  else if(!clearInvalid && currentValue){
+    el.insertAdjacentHTML("beforeend", `<option value="${escapeHtml(currentValue)}">${escapeHtml(currentValue)}</option>`);
+    el.value=currentValue;
+  }
 }
 
 document.getElementById("f_secteur").addEventListener("input", ()=>refreshBatimentOptions(true));
