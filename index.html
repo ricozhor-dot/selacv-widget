@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SELACV - Suivi exécution budgétaire</title>
+<title>SELACV V2 - Suivi de l’exécution budgétaire</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 <style>
@@ -70,6 +70,21 @@
   .filters-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}.filters-row input,.filters-row select{min-width:150px}.filters-row .search{flex:1;min-width:200px}.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}.empty-state{padding:36px 20px;text-align:center;color:var(--ink-soft)}.empty-state .em-title{font-size:16px;color:var(--accent);font-weight:700;margin-bottom:4px}
   .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px}.kpi-card{background:#f7f9ff;border:1px solid var(--line);border-radius:9px;padding:15px 18px;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.04)}.kpi-card .kpi-label{font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--ink-soft);font-weight:700}.kpi-card .kpi-value{font-size:26px;margin-top:4px;color:var(--accent);font-weight:700}.charts-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}.charts-grid .full{grid-column:1/-1}@media(max-width:820px){.charts-grid{grid-template-columns:1fr}}.chart-box{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:0 3px 10px rgba(0,0,0,.04)}.chart-box h3{font-size:13.5px;margin-bottom:10px;color:var(--accent)}.chart-box canvas{max-height:260px}
   .modal-backdrop{position:fixed;inset:0;background:rgba(34,53,111,.38);display:none;align-items:center;justify-content:center;z-index:1000}.modal-backdrop.open{display:flex}.modal{background:#fff;border-radius:12px;padding:22px 24px;width:520px;max-width:92vw;max-height:86vh;overflow:auto;border:1px solid var(--line);box-shadow:0 10px 28px rgba(0,0,0,.18)}.modal h2{margin-bottom:4px}.budget-config-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.budget-config-grid .field label{font-size:11.5px}.top-actions{display:flex;justify-content:flex-end;gap:10px;margin-bottom:14px}.footnote{color:var(--ink-soft);font-size:11.5px;margin-top:6px}
+
+  .version-chip{display:inline-flex;vertical-align:middle;margin-left:6px;padding:3px 7px;border-radius:999px;background:var(--accent);color:#fff;font-size:10px;letter-spacing:.08em}
+  .hero{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.75fr);gap:18px;margin-bottom:18px}
+  .hero-main{background:linear-gradient(135deg,var(--accent),#344f98);color:#fff;border-radius:14px;padding:24px;box-shadow:0 8px 24px rgba(34,53,111,.18);position:relative;overflow:hidden}
+  .hero-main:after{content:"";position:absolute;width:220px;height:220px;border:40px solid rgba(255,255,255,.07);border-radius:50%;right:-70px;top:-90px}
+  .hero-eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;opacity:.78}
+  .hero-title{font-size:25px;color:#fff;margin:6px 0 8px}.hero-copy{max-width:640px;font-size:13px;opacity:.88}
+  .hero-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}.hero-actions .btn-primary{background:#fff;color:var(--accent)}.hero-actions .btn-ghost{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.25)}
+  .hero-side{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 4px 12px rgba(0,0,0,.05)}
+  .hero-side h3{font-size:14px;margin-bottom:12px}.health-line{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px}.health-line:last-child{border-bottom:0}.health-value{font-weight:700;color:var(--accent)}
+  .dashboard-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr);gap:18px}.stack{display:flex;flex-direction:column;gap:18px}
+  .alert-list{display:flex;flex-direction:column;gap:9px}.alert-item{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border-radius:8px;background:var(--surface-alt);border-left:4px solid var(--accent)}.alert-item.warn{background:var(--warn-soft);border-color:#f2c952}.alert-item.danger{background:var(--danger-soft);border-color:#d66}.alert-icon{font-weight:700}.alert-copy strong{display:block;color:var(--accent);font-size:12.5px}.alert-copy span{font-size:11.5px;color:var(--ink-soft)}
+  .mini-list{display:flex;flex-direction:column}.mini-row{display:grid;grid-template-columns:92px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:center;font-size:12px}.mini-row:last-child{border-bottom:0}.mini-row .amount{font-family:"Courier New",monospace;font-weight:700;color:var(--accent)}
+  .section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}.section-head h2{margin-bottom:0}.section-link{border:0;background:none;color:var(--accent);font-weight:700;cursor:pointer;font-size:12px}
+  @media(max-width:900px){.hero,.dashboard-grid{grid-template-columns:1fr}}
   @media(max-width:760px){header.app-header{padding:12px 12px 0}.brand-logo{width:110px}.brand h1{font-size:17px}.brand .sub{font-size:10px}main{padding:16px 10px 40px}.field.span2{grid-column:span 1}.budget-config-grid{grid-template-columns:1fr}nav.tabs{overflow-x:auto}.panel{padding:16px}}
 </style>
 </head>
@@ -80,8 +95,8 @@
     <div class="brand">
       <img class="brand-logo" src="https://www.u-picardie.fr/sites/default/files/media/2024-06/upjv-bleu.png" alt="Logo UPJV">
       <div>
-        <h1>SELACV - Suivi exécution budgétaire</h1>
-        <div class="sub">Pilotage et suivi de l’exécution budgétaire</div>
+        <h1>SELACV <span class="version-chip">V2</span></h1>
+        <div class="sub">Suivi de l’exécution budgétaire · Service Exploitation et Logistique Amiens Centre-Ville</div>
       </div>
     </div>
     <div class="status-pill">
@@ -90,9 +105,11 @@
     </div>
   </div>
   <nav class="tabs">
-    <button class="tab-btn active" data-view="saisie">✎ Saisie <span class="role">Agent</span></button>
-    <button class="tab-btn" data-view="consult">☰ Consultation <span class="role">Lecture</span></button>
-    <button class="tab-btn" data-view="stats">◆ Pilotage &amp; Stats <span class="role">Direction</span></button>
+    <button class="tab-btn active" data-view="dashboard">⌂ Tableau de bord <span class="role">Direction</span></button>
+    <button class="tab-btn" data-view="saisie">＋ Nouvelle commande <span class="role">Agent</span></button>
+    <button class="tab-btn" data-view="modifier">✎ Modifier une commande <span class="role">Agent</span></button>
+    <button class="tab-btn" data-view="consult">☰ Commandes <span class="role">Suivi</span></button>
+    <button class="tab-btn" data-view="stats">◆ Analyses <span class="role">Pilotage</span></button>
   </nav>
   <svg class="arch-divider" viewBox="0 0 1200 14" preserveAspectRatio="none">
     <path d="M0,14 Q30,0 60,14 Q90,0 120,14 Q150,0 180,14 Q210,0 240,14 Q270,0 300,14 Q330,0 360,14 Q390,0 420,14 Q450,0 480,14 Q510,0 540,14 Q570,0 600,14 Q630,0 660,14 Q690,0 720,14 Q750,0 780,14 Q810,0 840,14 Q870,0 900,14 Q930,0 960,14 Q990,0 1020,14 Q1050,0 1080,14 Q1110,0 1140,14 Q1170,0 1200,14 L1200,14 L0,14 Z" fill="#F6F3EC"/>
@@ -101,8 +118,55 @@
 
 <main>
 
+
+  <!-- ============ VUE 0 : TABLEAU DE BORD V2 ============ -->
+  <section class="view active" id="view-dashboard">
+    <div class="hero">
+      <div class="hero-main">
+        <div class="hero-eyebrow">Pilotage budgétaire · Exercice en cours</div>
+        <h2 class="hero-title">Une vision immédiate des crédits et des commandes</h2>
+        <div class="hero-copy">Suivez les engagements, identifiez les lignes sous tension et accédez rapidement aux actions prioritaires du service.</div>
+        <div class="hero-actions">
+          <button class="btn btn-primary" data-go="saisie">＋ Saisir une commande</button>
+          <button class="btn btn-ghost" data-go="consult">Consulter les commandes</button>
+        </div>
+      </div>
+      <div class="hero-side">
+        <h3>État du dispositif</h3>
+        <div class="health-line"><span>Connexion Grist</span><span class="health-value" id="dashConnection">En attente</span></div>
+        <div class="health-line"><span>Dernière actualisation</span><span class="health-value" id="dashRefresh">—</span></div>
+        <div class="health-line"><span>Données suivies</span><span class="health-value" id="dashCount">0 commande</span></div>
+      </div>
+    </div>
+    <div class="kpi-grid" id="dashboardKpis"></div>
+    <div class="dashboard-grid">
+      <div class="stack">
+        <div class="panel">
+          <div class="section-head"><div><h2>Consommation des budgets</h2><div class="desc">Synthèse par site et nature de dépense.</div></div><button class="section-link" data-go="stats">Voir les analyses →</button></div>
+          <div class="budget-grid" id="dashboardBudgets"></div>
+        </div>
+        <div class="panel">
+          <div class="section-head"><div><h2>Dernières commandes</h2><div class="desc">Les mouvements les plus récents du document.</div></div><button class="section-link" data-go="consult">Tout consulter →</button></div>
+          <div class="mini-list" id="dashboardRecent"></div>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="panel">
+          <h2>Alertes et points de vigilance</h2>
+          <div class="desc">Signalements calculés automatiquement à partir des données disponibles.</div>
+          <div class="alert-list" id="dashboardAlerts"></div>
+        </div>
+        <div class="panel">
+          <h2>Commandes à traiter</h2>
+          <div class="desc">Commandes en attente, partielles ou avec postes manquants.</div>
+          <div class="mini-list" id="dashboardPending"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ VUE 1 : SAISIE AGENT ============ -->
-  <section class="view active" id="view-saisie">
+  <section class="view" id="view-saisie">
     <div class="panel">
       <h2>Nouvelle commande</h2>
       <div class="desc">Saisissez une commande de fonctionnement ou d'investissement. Les champs marqués <span class="req">*</span> sont recommandés.</div>
@@ -213,6 +277,70 @@
     </div>
   </section>
 
+  <!-- ============ VUE 2 : MODIFICATION ============ -->
+  <section class="view" id="view-modifier">
+    <div class="panel">
+      <h2>Modifier une commande</h2>
+      <div class="desc">Sélectionnez une commande, corrigez les informations nécessaires puis enregistrez les modifications directement dans Grist.</div>
+      <div class="form-grid" style="margin:18px 0; align-items:end;">
+        <div class="field span2">
+          <label>1. Sélection dans la liste complète</label>
+          <select id="edit_record_select"><option value="">— Sélectionner une commande —</option></select>
+        </div>
+        <div class="field">
+          <label>2. Rechercher par N° de bon de commande</label>
+          <input type="text" id="edit_search_bc" placeholder="Ex. BC-2026-00125">
+        </div>
+        <div class="field">
+          <label>3. Rechercher par fournisseur</label>
+          <input type="text" id="edit_search_supplier" list="dl_fournisseurs" placeholder="Nom du fournisseur">
+        </div>
+        <div class="field span2">
+          <label>Résultats de la recherche</label>
+          <select id="edit_search_results" disabled><option value="">— Saisissez un numéro ou un fournisseur —</option></select>
+        </div>
+        <div class="field" style="align-self:end;">
+          <button type="button" class="btn btn-primary" id="btnEditSearch">Rechercher</button>
+        </div>
+        <div class="field" style="align-self:end;">
+          <button type="button" class="btn btn-ghost" id="btnEditSearchClear">Effacer la recherche</button>
+        </div>
+      </div>
+      <div id="editSearchInfo" class="desc" style="margin:-6px 0 14px;">Vous pouvez utiliser l’un des trois modes de sélection.</div>
+      <div id="editEmpty" class="empty-state">Choisissez une commande dans la liste ou lancez une recherche pour afficher son contenu.</div>
+      <form id="formModifier" style="display:none;">
+        <input type="hidden" id="edit_id">
+        <div class="field" style="margin-bottom:14px; max-width:320px;">
+          <label>Type de budget</label>
+          <div class="type-toggle" id="editTypeToggle">
+            <button type="button" data-type="Fonctionnement" class="on">Fonctionnement</button>
+            <button type="button" data-type="Investissement">Investissement</button>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="field"><label>Site</label><select id="e_site" required><option>Cathédrale</option><option>Citadelle</option><option>Saint-Leu</option></select></div>
+          <div class="field"><label>Date</label><input type="date" id="e_date" required></div>
+          <div class="field"><label>N° BC / OS</label><input type="text" id="e_numbc"></div>
+          <div class="field"><label>Centre de coût</label><input type="text" id="e_centrecout"></div>
+          <div class="field"><label>Fournisseur</label><input type="text" id="e_fournisseur" list="dl_fournisseurs" required></div>
+          <div class="field"><label>Centrale d'achat</label><input type="text" id="e_centrale" list="dl_centrales"></div>
+          <div class="field"><label>Catégorie</label><input type="text" id="e_categorie" list="dl_categories" required></div>
+          <div class="field"><label>Marché</label><select id="e_marches"><option value="">—</option><option value="oui">oui</option><option value="non">non</option></select></div>
+          <div class="field span2"><label>Objet de la commande</label><input type="text" id="e_objet" required></div>
+          <div class="field span2"><label>Motivations d'achat</label><textarea id="e_motivations"></textarea></div>
+          <div class="field"><label>Montant TTC (€)</label><input type="number" step="0.01" min="0" id="e_montant" required></div>
+          <div class="field"><label>Validation (agent)</label><input type="text" id="e_validation"></div>
+          <div class="field"><label>État commande</label><select id="e_etat"><option>Attente</option><option>Livrée</option><option>Partielle</option><option>Annulée</option><option>Retour</option></select></div>
+          <div class="field"><label>Postes manquants</label><input type="text" id="e_postes"></div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" id="btnCancelEdit">Annuler</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveEdit">✓ Enregistrer les modifications</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
   <!-- ============ VUE 2 : CONSULTATION ============ -->
   <section class="view" id="view-consult">
     <div class="site-tabs" id="siteTabs">
@@ -246,7 +374,7 @@
           <thead><tr>
             <th data-k="Date">Date</th><th data-k="Site">Site</th><th data-k="Type">Type</th>
             <th data-k="Fournisseur">Fournisseur</th><th data-k="Categorie">Catégorie</th>
-            <th data-k="Objet">Objet</th><th data-k="MontantTTC">Montant</th><th data-k="EtatCommande">État</th>
+            <th data-k="Objet">Objet</th><th data-k="MontantTTC">Montant</th><th data-k="EtatCommande">État</th><th>Action</th>
           </tr></thead>
           <tbody id="consultBody"></tbody>
         </table>
@@ -330,6 +458,7 @@ let mappings = null;
 let budgets = JSON.parse(JSON.stringify(DEFAULT_BUDGETS));
 let selectedSite = "__all__";
 let selectedType = "Fonctionnement"; // for saisie form
+let selectedEditType = "Fonctionnement";
 let sortKey = "Date", sortDir = -1;
 let charts = {};
 
@@ -371,6 +500,8 @@ if (isGristAvailable()) {
 function setStatus(ok){
   document.getElementById("statusDot").classList.toggle("off", !ok);
   document.getElementById("statusText").textContent = ok ? "Connecté au document Grist" : "En attente de connexion Grist";
+  const dc=document.getElementById("dashConnection");
+  if(dc) dc.textContent=ok ? "Opérationnelle" : "En attente";
 }
 
 function normalizeRecord(r){
@@ -484,14 +615,16 @@ function saveBudgets(newBudgets){
 }
 
 /* ================= TABS ================= */
-document.querySelectorAll(".tab-btn").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-    btn.classList.add("active");
-    document.getElementById("view-"+btn.dataset.view).classList.add("active");
-    if (btn.dataset.view === "stats") renderCharts();
-  });
+function goToView(view){
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active", b.dataset.view===view));
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active", v.id==="view-"+view));
+  if (view === "stats") requestAnimationFrame(renderCharts);
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+document.querySelectorAll(".tab-btn").forEach(btn=>btn.addEventListener("click", ()=>goToView(btn.dataset.view)));
+document.addEventListener("click", e=>{
+  const go=e.target.closest("[data-go]");
+  if(go) goToView(go.dataset.go);
 });
 
 /* ================= TOASTS ================= */
@@ -515,7 +648,12 @@ document.querySelectorAll(".type-toggle button").forEach(btn=>{
 
 document.getElementById("f_date").valueAsDate = new Date();
 
-document.getElementById("btnReset").addEventListener("click", ()=> document.getElementById("formSaisie").reset());
+document.getElementById("btnReset").addEventListener("click", ()=> {
+  document.getElementById("formSaisie").reset();
+  selectedType = "Fonctionnement";
+  document.querySelectorAll(".type-toggle button").forEach(b=>b.classList.toggle("on", b.dataset.type===selectedType));
+  document.getElementById("f_date").valueAsDate = new Date();
+});
 
 document.getElementById("formSaisie").addEventListener("submit", async (e)=>{
   e.preventDefault();
@@ -584,6 +722,95 @@ function etatSelect(r){
   return `<select class="etat-inline" data-id="${r.id}" style="padding:4px 8px; font-size:12px;">
     ${states.map(s=>`<option ${s===r.EtatCommande?"selected":""}>${s}</option>`).join("")}
   </select>`;
+}
+
+/* ================= MODIFICATION ================= */
+function renderEditOptions(){
+  const sel = document.getElementById("edit_record_select");
+  const current = sel.value;
+  const sorted = [...records].sort((a,b)=>(b.Date||"").localeCompare(a.Date||"") || (b.id||0)-(a.id||0));
+  sel.innerHTML = `<option value="">— Sélectionner une commande —</option>` + sorted.map(r=>
+    `<option value="${r.id}">${escapeHtml(editOptionLabel(r))}</option>`
+  ).join("");
+  if (sorted.some(r=>String(r.id)===String(current))) sel.value=current;
+}
+function loadEditRecord(id){
+  const r = records.find(x=>String(x.id)===String(id));
+  const form=document.getElementById("formModifier"), empty=document.getElementById("editEmpty");
+  if(!r){ form.style.display="none"; empty.style.display="block"; return; }
+  empty.style.display="none"; form.style.display="block";
+  document.getElementById("edit_id").value=r.id;
+  selectedEditType=r.Type||"Fonctionnement";
+  document.querySelectorAll("#editTypeToggle button").forEach(b=>b.classList.toggle("on", b.dataset.type===selectedEditType));
+  const values={e_site:r.Site,e_date:r.Date,e_numbc:r.NumBC,e_centrecout:r.CentreCout,e_fournisseur:r.Fournisseur,e_centrale:r.CentraleAchat,e_categorie:r.Categorie,e_marches:r.Marches,e_objet:r.Objet,e_motivations:r.Motivations,e_montant:r.MontantTTC,e_validation:r.Validation,e_etat:r.EtatCommande,e_postes:r.PostesManquants};
+  Object.entries(values).forEach(([id,v])=>{const el=document.getElementById(id);if(el) el.value=v??"";});
+}
+document.querySelectorAll("#editTypeToggle button").forEach(btn=>btn.addEventListener("click",()=>{
+  document.querySelectorAll("#editTypeToggle button").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on"); selectedEditType=btn.dataset.type;
+}));
+function editOptionLabel(r){
+  const bc = r.NumBC ? `BC ${r.NumBC}` : "Sans N° BC";
+  return `${bc} · ${r.Date||"Sans date"} · ${r.Site||"Sans site"} · ${r.Fournisseur||"Sans fournisseur"} · ${r.Objet||"Sans objet"} · ${fmtEUR(r.MontantTTC)}`;
+}
+function selectEditRecord(id){
+  if(!id) return loadEditRecord("");
+  document.getElementById("edit_record_select").value=String(id);
+  const results=document.getElementById("edit_search_results");
+  if([...results.options].some(o=>o.value===String(id))) results.value=String(id);
+  loadEditRecord(id);
+}
+function runEditSearch(){
+  const bc=document.getElementById("edit_search_bc").value.trim().toLowerCase();
+  const supplier=document.getElementById("edit_search_supplier").value.trim().toLowerCase();
+  const results=document.getElementById("edit_search_results");
+  const info=document.getElementById("editSearchInfo");
+  if(!bc && !supplier){
+    results.disabled=true;
+    results.innerHTML='<option value="">— Saisissez un numéro ou un fournisseur —</option>';
+    info.textContent="Saisissez au moins un numéro de bon de commande ou un fournisseur.";
+    return;
+  }
+  const matches=records.filter(r=>{
+    const bcOk=!bc || String(r.NumBC||"").toLowerCase().includes(bc);
+    const supplierOk=!supplier || String(r.Fournisseur||"").toLowerCase().includes(supplier);
+    return bcOk && supplierOk;
+  }).sort((a,b)=>(b.Date||"").localeCompare(a.Date||"") || (b.id||0)-(a.id||0));
+  results.disabled=matches.length===0;
+  results.innerHTML=matches.length
+    ? '<option value="">— Sélectionner parmi les résultats —</option>'+matches.map(r=>`<option value="${r.id}">${escapeHtml(editOptionLabel(r))}</option>`).join("")
+    : '<option value="">Aucune commande trouvée</option>';
+  info.textContent=matches.length===0 ? "Aucune commande ne correspond à cette recherche." : `${matches.length} commande${matches.length>1?"s":""} trouvée${matches.length>1?"s":""}.`;
+  if(matches.length===1) selectEditRecord(matches[0].id);
+}
+function clearEditSearch(){
+  document.getElementById("edit_search_bc").value="";
+  document.getElementById("edit_search_supplier").value="";
+  const results=document.getElementById("edit_search_results");
+  results.disabled=true;
+  results.innerHTML='<option value="">— Saisissez un numéro ou un fournisseur —</option>';
+  document.getElementById("editSearchInfo").textContent="Vous pouvez utiliser l’un des trois modes de sélection.";
+}
+document.getElementById("edit_record_select").addEventListener("change",e=>selectEditRecord(e.target.value));
+document.getElementById("edit_search_results").addEventListener("change",e=>selectEditRecord(e.target.value));
+document.getElementById("btnEditSearch").addEventListener("click",runEditSearch);
+document.getElementById("btnEditSearchClear").addEventListener("click",clearEditSearch);
+document.getElementById("edit_search_bc").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();runEditSearch();}});
+document.getElementById("edit_search_supplier").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();runEditSearch();}});
+document.getElementById("btnCancelEdit").addEventListener("click",()=>{
+  document.getElementById("edit_record_select").value=""; clearEditSearch(); loadEditRecord("");
+});
+document.getElementById("formModifier").addEventListener("submit",async e=>{
+  e.preventDefault(); const btn=document.getElementById("btnSaveEdit"); btn.disabled=true;
+  try{
+    const id=Number(document.getElementById("edit_id").value);
+    const fields={Date:dateToGrist(document.getElementById("e_date").value),Type:selectedEditType,Site:document.getElementById("e_site").value,NumBC:document.getElementById("e_numbc").value,CentreCout:document.getElementById("e_centrecout").value,Fournisseur:document.getElementById("e_fournisseur").value,CentraleAchat:document.getElementById("e_centrale").value,Categorie:document.getElementById("e_categorie").value,Objet:document.getElementById("e_objet").value,Marches:document.getElementById("e_marches").value,Motivations:document.getElementById("e_motivations").value,MontantTTC:parseFloat(document.getElementById("e_montant").value)||0,Validation:document.getElementById("e_validation").value,EtatCommande:document.getElementById("e_etat").value,PostesManquants:document.getElementById("e_postes").value};
+    await updateRecord(id,fields); toast("Commande modifiée ✓");
+  }catch(err){console.error(err);toast("Erreur lors de la modification : "+(err.message||err),true);}finally{btn.disabled=false;}
+});
+function openEditRecord(id){
+  goToView("modifier");
+  selectEditRecord(id);
 }
 
 /* ================= CONSULTATION ================= */
@@ -717,6 +944,7 @@ function renderConsultTable(){
       <td>${escapeHtml(r.Objet)}</td>
       <td class="mono">${fmtEUR(r.MontantTTC)}</td>
       <td>${badge(r.EtatCommande)}</td>
+      <td><button class="btn btn-ghost btn-sm edit-row" data-id="${r.id}">Modifier</button></td>
     </tr>
   `).join("");
 
@@ -727,6 +955,7 @@ function renderConsultTable(){
   const cur = catSel.value;
   const cats = [...new Set(records.map(r=>r.Categorie).filter(Boolean))].sort();
   catSel.innerHTML = `<option value="">Toutes catégories</option>` + cats.map(c=>`<option ${c===cur?"selected":""}>${c}</option>`).join("");
+  document.querySelectorAll(".edit-row").forEach(btn=>btn.addEventListener("click",()=>openEditRecord(btn.dataset.id)));
 }
 
 function badge(etat){
@@ -785,7 +1014,7 @@ function exportCSV(){
   const blob = new Blob(["\uFEFF"+lines.join("\n")], {type:"text/csv;charset=utf-8;"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = "SELACV_suivi_execution_budgetaire.csv"; a.click();
+  a.href = url; a.download = "SELACV_V2_suivi_execution_budgetaire.csv"; a.click();
   URL.revokeObjectURL(url);
 }
 
@@ -893,10 +1122,53 @@ function escapeHtml(s){
   return String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 
+
+/* ================= TABLEAU DE BORD V2 ================= */
+function budgetTotals(){
+  const initial=SITES.reduce((sum,s)=>sum+TYPES.reduce((x,t)=>x+(budgets[s][t]||0),0),0);
+  const engaged=engagedRecords("__all__").reduce((sum,r)=>sum+r.MontantTTC,0);
+  return {initial,engaged,remaining:initial-engaged,pct:initial>0?engaged/initial*100:0};
+}
+function renderDashboard(){
+  const totals=budgetTotals();
+  const pending=records.filter(r=>["Attente","Partielle","Retour"].includes(r.EtatCommande));
+  const missing=records.filter(r=>String(r.PostesManquants||"").trim());
+  const kpis=[
+    {label:"Budget initial",value:fmtEUR(totals.initial)},
+    {label:"Crédits engagés",value:fmtEUR(totals.engaged)},
+    {label:"Solde disponible",value:fmtEUR(totals.remaining)},
+    {label:"Taux d'exécution",value:(totals.initial?totals.pct:0).toFixed(0)+"%"},
+    {label:"À traiter",value:pending.length}
+  ];
+  document.getElementById("dashboardKpis").innerHTML=kpis.map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.value}</div></div>`).join("");
+  document.getElementById("dashCount").textContent=`${records.length} commande${records.length>1?"s":""}`;
+  document.getElementById("dashRefresh").textContent=new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+
+  let budgetHtml="";
+  SITES.forEach(site=>TYPES.forEach(type=>{
+    const b=computeBudgetFor(site,type), cls=b.pct>=100?"danger":b.pct>=80?"warn":"";
+    budgetHtml+=`<div class="budget-card ${b.solde<0?"over":""}"><div class="bc-head"><div class="bc-title">${site} · ${type}</div><div class="bc-pct">${b.pct.toFixed(0)}%</div></div><div class="bar-track"><div class="bar-fill ${cls}" style="width:${Math.min(100,b.pct)}%"></div></div><div class="bc-row"><span>Engagé</span><span class="v">${fmtEUR(b.engaged)}</span></div><div class="bc-row"><span>Disponible</span><span class="v ${b.solde<0?"bc-solde-neg":"bc-solde-pos"}">${fmtEUR(b.solde)}</span></div></div>`;
+  }));
+  document.getElementById("dashboardBudgets").innerHTML=budgetHtml;
+
+  const latest=[...records].sort((a,b)=>(b.id||0)-(a.id||0)).slice(0,6);
+  document.getElementById("dashboardRecent").innerHTML=latest.map(r=>`<div class="mini-row"><span>${r.Date||"—"}</span><span><strong>${escapeHtml(r.Fournisseur)||"Fournisseur non renseigné"}</strong><br>${escapeHtml(r.Objet)||"Objet non renseigné"}</span><span class="amount">${fmtEUR(r.MontantTTC)}</span></div>`).join("")||'<div class="empty-state">Aucune commande enregistrée.</div>';
+
+  const alerts=[];
+  SITES.forEach(site=>TYPES.forEach(type=>{const b=computeBudgetFor(site,type);if(b.init>0&&b.pct>=100)alerts.push({c:"danger",t:`Budget dépassé · ${site}`,d:`${type} : ${b.pct.toFixed(0)} % consommés.`});else if(b.init>0&&b.pct>=80)alerts.push({c:"warn",t:`Seuil de vigilance · ${site}`,d:`${type} : ${b.pct.toFixed(0)} % consommés.`});}));
+  if(missing.length) alerts.push({c:"warn",t:"Postes manquants",d:`${missing.length} commande(s) nécessitent un complément.`});
+  if(!alerts.length) alerts.push({c:"",t:"Aucune alerte majeure",d:"Les indicateurs disponibles ne signalent pas de dépassement."});
+  document.getElementById("dashboardAlerts").innerHTML=alerts.slice(0,8).map(a=>`<div class="alert-item ${a.c}"><div class="alert-icon">${a.c==="danger"?"!":a.c==="warn"?"△":"✓"}</div><div class="alert-copy"><strong>${a.t}</strong><span>${a.d}</span></div></div>`).join("");
+
+  document.getElementById("dashboardPending").innerHTML=pending.slice(0,7).map(r=>`<div class="mini-row"><span>${badge(r.EtatCommande)}</span><span>${escapeHtml(r.Objet)||"Commande sans objet"}<br><small>${escapeHtml(r.Site)} · ${escapeHtml(r.Fournisseur)}</small></span><span class="amount">${fmtEUR(r.MontantTTC)}</span></div>`).join("")||'<div class="empty-state">Aucune commande à traiter.</div>';
+}
+
 /* ================= MASTER RENDER ================= */
 function renderAll(){
+  renderDashboard();
   renderRecentEntries();
   renderDatalists();
+  renderEditOptions();
   renderBudgetCards();
   renderConsultTable();
   renderKPIs();
